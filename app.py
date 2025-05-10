@@ -12,10 +12,16 @@ def all_exhibitors():
 
         while True:
             response = requests.post(
-                "https://exhibitors.intersolar.de/en/ajax/exhibitorsearch",
-                json={"searchText": "", "filters": [], "page": page, "lang": "en"},
-                headers={"Content-Type": "application/json"}
-            )
+    "https://exhibitors.intersolar.de/en/ajax/exhibitorsearch",
+    json={
+        "searchText": "",
+        "filters": [],
+        "page": page,
+        "lang": "en"
+    },
+    headers={"Content-Type": "application/json"},
+    verify=False  # ❗️ SSL kontrolünü devre dışı bırak
+)
             response.raise_for_status()
             json_data = response.json()
 
