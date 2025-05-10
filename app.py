@@ -6,19 +6,14 @@ app = Flask(__name__)
 
 @app.route('/all-exhibitors', methods=['GET'])
 def all_exhibitors():
-    page = 1
-    all_exhibitors = []
-
     try:
+        page = 1
+        all_exhibitors = []
+
         while True:
             response = requests.post(
                 "https://exhibitors.intersolar.de/en/ajax/exhibitorsearch",
-                json={
-                    "searchText": "",
-                    "filters": [],
-                    "page": page,
-                    "lang": "en"
-                },
+                json={"searchText": "", "filters": [], "page": page, "lang": "en"},
                 headers={"Content-Type": "application/json"}
             )
             response.raise_for_status()
@@ -26,8 +21,8 @@ def all_exhibitors():
 
             if "data" not in json_data or "exhibitors" not in json_data["data"]:
                 return jsonify({
-                    "error": "API yanıtında 'data' veya 'exhibitors' alanı yok.",
-                    "full_response": json_data
+                    "error": "API yanıtında 'data' veya 'exhibitors' yok",
+                    "json": json_data
                 }), 500
 
             exhibitors = json_data["data"]["exhibitors"]
