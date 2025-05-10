@@ -1,53 +1,17 @@
 from flask import Flask, jsonify
-import requests
-import traceback
+import json
+import os
 
 app = Flask(__name__)
 
-@app.route('/all-exhibitors', methods=['GET'])
-def all_exhibitors():
+@app.route("/pv-news", methods=["GET"])
+def get_news():
     try:
-        page = 1
-        all_exhibitors = []
-
-        while True:
-            response = requests.post(
-    "https://exhibitors.intersolar.de/en/ajax/exhibitorsearch",
-    json={
-        "searchText": "",
-        "filters": [],
-        "page": page,
-        "lang": "en"
-    },
-    headers={"Content-Type": "application/json"},
-    verify=False  # ❗️ SSL kontrolünü devre dışı bırak
-)
-            response.raise_for_status()
-            json_data = response.json()
-
-            if "data" not in json_data or "exhibitors" not in json_data["data"]:
-                return jsonify({
-                    "error": "API yanıtında 'data' veya 'exhibitors' yok",
-                    "json": json_data
-                }), 500
-
-            exhibitors = json_data["data"]["exhibitors"]
-            total_pages = json_data["data"].get("totalPages", 1)
-
-            all_exhibitors.extend(exhibitors)
-
-            if page >= total_pages:
-                break
-            page += 1
-
-        return jsonify(all_exhibitors)
-
+        with open(os.path.join("data", "news.json"), "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return jsonify(data)
     except Exception as e:
-        return jsonify({
-            "error": str(e),
-            "trace": traceback.format_exc()
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
